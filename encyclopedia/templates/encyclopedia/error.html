@@ -1,0 +1,8 @@
+{% extends "encyclopedia/layout.html" %}
+
+{% block title %}Page not found - Wiki{% endblock %}
+
+{% block body %}
+    <h1>Page not found</h1>
+    <p>The requested encyclopedia page{% if title %} “{{ title }}”{% endif %} was not found.</p>
+{% endblock %}
