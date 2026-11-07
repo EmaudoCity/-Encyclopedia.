@@ -1,0 +1,26 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>{% block title %}Wiki{% endblock %}</title>
+        <link href="{% static 'encyclopedia/styles.css' %}" rel="stylesheet">
+    </head>
+    <body>
+        <aside>
+            <h2>Wiki</h2>
+            <form action="{% url 'encyclopedia:search' %}" method="get">
+                <label for="search">Search Encyclopedia</label>
+                <input id="search" type="search" name="q" value="{{ query }}">
+                <button type="submit">Search</button>
+            </form>
+            <nav aria-label="Main navigation">
+                <a href="{% url 'encyclopedia:index' %}">Home</a>
+                <a href="{% url 'encyclopedia:new' %}">Create New Page</a>
+                <a href="{% url 'encyclopedia:random' %}">Random Page</a>
+            </nav>
+        </aside>
+        <main>{% block body %}{% endblock %}</main>
+    </body>
+</html>

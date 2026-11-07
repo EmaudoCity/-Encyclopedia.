@@ -1,0 +1,12 @@
+{% extends "encyclopedia/layout.html" %}
+
+{% block title %}{{ heading }} - Wiki{% endblock %}
+
+{% block body %}
+    <h1>{{ heading }}</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Save Page</button>
+    </form>
+{% endblock %}

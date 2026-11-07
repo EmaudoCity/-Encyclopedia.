@@ -1,0 +1,40 @@
+body {
+    margin: 0;
+    display: flex;
+    min-height: 100vh;
+    font-family: sans-serif;
+    line-height: 1.5;
+}
+
+aside {
+    width: 15rem;
+    padding: 1.5rem;
+    background: #f0f0f0;
+    flex-shrink: 0;
+}
+
+nav a {
+    display: block;
+    margin-top: 0.75rem;
+}
+
+main {
+    padding: 2rem;
+    min-width: 0;
+    flex: 1;
+}
+
+textarea {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.errorlist {
+    color: #a00;
+}
+
+@media (max-width: 600px) {
+    body { flex-direction: column; }
+    aside { width: auto; }
+}
