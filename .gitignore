@@ -4,3 +4,4 @@ db.sqlite3
 .venv/
 .env
 staticfiles/
+entries/.save.lock

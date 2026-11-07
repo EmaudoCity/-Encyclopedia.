@@ -1,5 +1,7 @@
 from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
 from tempfile import TemporaryDirectory
+from threading import Barrier
 from unittest.mock import patch
 
 from django.test import Client, SimpleTestCase, override_settings
@@ -80,6 +82,21 @@ class WikiTests(SimpleTestCase):
             self.assertContains(response, "Replacement")
         self.assertEqual(util.get_entry("Python"), original)
         self.assertEqual(util.list_entries(), ["Django", "Python"])
+
+    def test_concurrent_creation_rejects_case_variant_duplicate(self):
+        barrier = Barrier(2)
+
+        def create(title):
+            barrier.wait(timeout=5)
+            return Client().post(reverse("encyclopedia:new"),
+                                 {"title": title, "content": title})
+
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            responses = list(executor.map(create, ["Concurrent", "concurrent"]))
+        self.assertEqual(sorted(response.status_code for response in responses), [200, 302])
+        entries = [name for name in util.list_entries() if name.casefold() == "concurrent"]
+        self.assertEqual(len(entries), 1)
+        self.assertEqual(util.get_entry(entries[0]), entries[0])
 
     def test_invalid_and_missing_form_fields_do_not_create_files(self):
         for title in ("../outside", r"..\outside", "/absolute", ".", "", "<script>"):

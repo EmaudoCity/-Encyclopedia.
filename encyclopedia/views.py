@@ -3,7 +3,9 @@ import random
 import bleach
 import markdown2
 from django.shortcuts import redirect, render
+from django.core.files.storage import default_storage
 from django.views.decorators.http import require_GET, require_http_methods
+from filelock import FileLock
 
 from . import util
 from .forms import EntryForm
@@ -58,11 +60,12 @@ def new_page(request):
     form = EntryForm(request.POST if request.method == "POST" else None)
     if request.method == "POST" and form.is_valid():
         title = form.cleaned_data["title"]
-        if entry_title(title) is not None:
-            form.add_error("title", "An entry with this title already exists.")
-        else:
-            util.save_entry(title, form.cleaned_data["content"])
-            return redirect("encyclopedia:entry", title=title)
+        with FileLock(default_storage.path("entries/.save.lock")):
+            if entry_title(title) is not None:
+                form.add_error("title", "An entry with this title already exists.")
+            else:
+                util.save_entry(title, form.cleaned_data["content"])
+                return redirect("encyclopedia:entry", title=title)
     return render(request, "encyclopedia/form.html", {"form": form, "heading": "Create New Page"})
 
 
@@ -79,7 +82,8 @@ def edit_page(request, title):
     )
     form.fields["title"].disabled = True
     if request.method == "POST" and form.is_valid():
-        util.save_entry(title, form.cleaned_data["content"])
+        with FileLock(default_storage.path("entries/.save.lock")):
+            util.save_entry(title, form.cleaned_data["content"])
         return redirect("encyclopedia:entry", title=title)
     return render(request, "encyclopedia/form.html", {"form": form, "heading": f"Edit {title}"})
 
